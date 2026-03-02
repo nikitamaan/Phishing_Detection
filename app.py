@@ -1,12 +1,14 @@
 import streamlit as st
 import pickle
 import numpy as np
-st.set_page_config(page_title="AI Phishing Detector")
-st.title("🛡AI-Driven Phishing Link Detection")
-st.write("Enter a URL below to check if it's safe or a scam.")
-url_input = st.text_input("Paste the URL here:")
-if st.button("Analyze URL"):
+
+st.set_page_config(page_title="AI Phishing Detector (Dev Mode)")
+st.title("AI-Driven Phishing Link Detection")
+st.info("Researching Feature Extraction Logic")
+url_input = st.text_input("Enter URL for analysis:")
+
+if st.button("Run Preliminary Analysis"):
     if url_input:
-        st.info(f"Analyzing: {url_input}...")
+        st.warning("Feature Mapping in progress. Validating input string length and special characters")
     else:
-        st.warning("Please enter a URL first.")
+        st.error("Please provide a URL.")
