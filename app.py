@@ -1,14 +1,42 @@
 import streamlit as st
 import pickle
 import numpy as np
+import re
+@st.cache_resource
+def load_model():
+    return pickle.load(open('phishing_model.pkl', 'rb'))
 
-st.set_page_config(page_title="AI Phishing Detector (Dev Mode)")
-st.title("AI-Driven Phishing Link Detection")
-st.info("Researching Feature Extraction Logic")
-url_input = st.text_input("Enter URL for analysis:")
+try:
+    model = load_model()
+except Exception as e:
+    st.error(f"Error loading model: {e}")
 
-if st.button("Run Preliminary Analysis"):
+def extract_features(url):
+    features = []
+    features.append(len(url))             
+    features.append(url.count('.'))      
+    features.append(url.count('-'))      
+    features.append(1 if '@' in url else 0) 
+    features.append(url.count('//'))     
+    while len(features) < 30:
+        features.append(0)
+    
+    return np.array(features).reshape(1, -1)
+st.set_page_config(page_title="AI Phishing Detector", page_icon="🛡️")
+st.title("🛡️ AI-Driven Phishing Link Detection")
+st.write("A machine learning portal to verify URL safety")
+
+url_input = st.text_input("Enter the URL to be analyzed:", placeholder="https://example.com")
+
+if st.button("Analyze Now"):
     if url_input:
-        st.warning("Feature Mapping in progress. Validating input string length and special characters")
+        with st.spinner('Scanning URL patterns'):
+            vector = extract_features(url_input)
+            prediction = model.predict(vector)
+            st.subheader("Verdict:")
+            if prediction[0] == 1:
+                st.error(f" **PHISHING DETECTED!** '{url_input}' is high-risk.")
+            else:
+                st.success(f"**SAFE URL.** No malicious patterns found for '{url_input}'.")
     else:
-        st.error("Please provide a URL.")
+        st.warning("Please enter a URL first")
